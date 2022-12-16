@@ -147,9 +147,15 @@
   <ItemGroup>
     <ClCompile Include="Chess.cpp" />
     <ClCompile Include="Dependencies\GLAD\src\glad.c" />
+    <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="Shaders\triangle.frag" />
+    <None Include="Shaders\triangle.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,26 +2,10 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "Shader.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
-
-const char* vertexShaderSource = "#version 460 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec3 aColor;\n"
-"out vec3 ourColor;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos, 1.0);\n"
-"   ourColor = aColor;\n"	
-"}\0";
-
-const char* fragmentShaderSource = "#version 460 core\n"
-"out vec4 FragColor;\n"
-"in vec3 ourColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(ourColor, 1.0);\n"
-"}\n\0";
 
 int main() {
 	glfwInit();
@@ -47,46 +31,7 @@ int main() {
 
 	glViewport(0, 0, 800, 600);
 
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-	if (!success) {
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cerr << "ERROR Vertex Shader compilation failed " << infoLog << std::endl;
-	}
-
-	unsigned int fragmentShader1;
-	fragmentShader1 = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(fragmentShader1, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader1);
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(fragmentShader1, 512, NULL, infoLog);
-		std::cerr << "ERROR Fragment Shader compilation failed " << infoLog << std::endl;
-	}
-
-	unsigned int shaderProgram1;
-	shaderProgram1 = glCreateProgram();
-
-		glAttachShader(shaderProgram1, vertexShader);
-	glAttachShader(shaderProgram1, fragmentShader1);
-	glLinkProgram(shaderProgram1);
-	glGetProgramiv(shaderProgram1, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram1, 512, NULL, infoLog);
-		std::cerr << "Error Shader Program linking failed " << infoLog << std::endl;
-	}
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader1);
+	Shader shader("./Shaders/triangle.vert", "./Shaders/triangle.frag");
 
 	float triangle1[] = {
 		// positions			// colors
@@ -118,11 +63,7 @@ int main() {
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		float timeValue = glfwGetTime();
-		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		int vertexColourLocation = glGetUniformLocation(shaderProgram1, "ourColor");
-		glUseProgram(shaderProgram1);
-		glUniform4f(vertexColourLocation, 0.0f, greenValue, 0.0f, 1.0f);
+		shader.use();
 		glBindVertexArray(vao1);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glfwSwapBuffers(window);
