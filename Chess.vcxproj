@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\STB_Image\include;$(SolutionDir)Dependencies\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,7 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\STB_Image\include;$(SolutionDir)Dependencies\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,6 +147,41 @@
   <ItemGroup>
     <ClCompile Include="Chess.cpp" />
     <ClCompile Include="Dependencies\GLAD\src\glad.c" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Dependencies\STB_Image\src\stb_image.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Dependencies\glm\common.hpp" />
+    <ClInclude Include="Dependencies\glm\exponential.hpp" />
+    <ClInclude Include="Dependencies\glm\ext.hpp" />
+    <ClInclude Include="Dependencies\glm\fwd.hpp" />
+    <ClInclude Include="Dependencies\glm\geometric.hpp" />
+    <ClInclude Include="Dependencies\glm\glm.hpp" />
+    <ClInclude Include="Dependencies\glm\integer.hpp" />
+    <ClInclude Include="Dependencies\glm\mat2x2.hpp" />
+    <ClInclude Include="Dependencies\glm\mat2x3.hpp" />
+    <ClInclude Include="Dependencies\glm\mat2x4.hpp" />
+    <ClInclude Include="Dependencies\glm\mat3x2.hpp" />
+    <ClInclude Include="Dependencies\glm\mat3x3.hpp" />
+    <ClInclude Include="Dependencies\glm\mat3x4.hpp" />
+    <ClInclude Include="Dependencies\glm\mat4x2.hpp" />
+    <ClInclude Include="Dependencies\glm\mat4x3.hpp" />
+    <ClInclude Include="Dependencies\glm\mat4x4.hpp" />
+    <ClInclude Include="Dependencies\glm\matrix.hpp" />
+    <ClInclude Include="Dependencies\glm\packing.hpp" />
+    <ClInclude Include="Dependencies\glm\trigonometric.hpp" />
+    <ClInclude Include="Dependencies\glm\vec2.hpp" />
+    <ClInclude Include="Dependencies\glm\vec3.hpp" />
+    <ClInclude Include="Dependencies\glm\vec4.hpp" />
+    <ClInclude Include="Dependencies\glm\vector_relational.hpp" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Dependencies\STB_Image\include\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Dependencies\glm\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
