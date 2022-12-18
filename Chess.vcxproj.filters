@@ -1301,5 +1301,11 @@
   <ItemGroup>
     <Image Include="Textures\dark.jfif" />
     <Image Include="Textures\light.jfif" />
+    <Image Include="Textures\dark.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\light.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

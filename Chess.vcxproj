@@ -580,7 +580,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\dark.jfif" />
+    <Image Include="Textures\dark.jpg" />
     <Image Include="Textures\light.jfif" />
+    <Image Include="Textures\light.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

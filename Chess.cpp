@@ -111,7 +111,7 @@ int main() {
 
 	Shader shader = Shader("./Shaders/plane.vert", "./Shaders/plane.frag");
 
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
+	glm::vec3 cameraPos = glm::vec3(-0.4f, 0.0f, 9.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
