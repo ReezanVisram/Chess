@@ -6,7 +6,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include "Shader.h"
 #include "Camera.h"
 
@@ -122,12 +124,31 @@ int main() {
 	}
 	stbi_image_free(lightData);
 
-	unsigned int vbo, vao;
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
+	unsigned int borderTexture;
+	glGenTextures(1, &borderTexture);
+	glBindTexture(GL_TEXTURE_2D, borderTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	int borderWidth, borderHeight, borderNrChannels;
+	unsigned char* borderData = stbi_load("./Textures/border.jpg", &borderWidth, &borderHeight, &borderNrChannels, 0);
+	if (borderData) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, borderWidth, borderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, borderData);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cerr << "ERROR Failed to load Border Texture" << std::endl;
+	}
+	stbi_image_free(borderData);
+	unsigned int squaresVbo, squaresVao;
+	glGenVertexArrays(1, &squaresVao);
+	glGenBuffers(1, &squaresVbo);
+
+	glBindVertexArray(squaresVao);
+	glBindBuffer(GL_ARRAY_BUFFER, squaresVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -241,7 +262,7 @@ int main() {
 			model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 			squareShader.setMat4Uniform("model", model);
 			glBindTexture(GL_TEXTURE_2D, darkTexture);
-			glBindVertexArray(vao);
+			glBindVertexArray(squaresVao);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		for (unsigned int i = 0; i < 32; i++) {
@@ -250,7 +271,7 @@ int main() {
 			model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 			squareShader.setMat4Uniform("model", model);
 			glBindTexture(GL_TEXTURE_2D, lightTexture);
-			glBindVertexArray(vao);
+			glBindVertexArray(squaresVao);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		lampShader.use();
