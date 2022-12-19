@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "Camera.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
@@ -37,15 +38,59 @@ int main() {
 	glViewport(0, 0, 800, 600);
 
 	float vertices[] = {
-		0.5f, 0.5f,	0.0f,	1.0f, 1.0f,	// top right
-		0.5f, -0.5f, 0.0f,	1.0f, 0.0f,	// bottom right
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,	// bottom left
-		-0.5f, 0.5f, 0.0f,	0.0f, 1.0f	// top left
+		0.5f, 0.5f,	0.0f,		1.0f, 1.0f,		0.0f, 0.0f, -0.5f, // top right
+		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,		0.0f, 0.0f, -0.5f, // bottom right
+		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,		0.0f, 0.0f, -0.5f, // bottom left
+		-0.5f, 0.5f, 0.0f,		0.0f, 1.0f,		0.0f, 0.0f, -0.5f, // top left
 	};
 
 	unsigned int indices[] = {
 		0, 1, 3,
 		1, 2, 3
+	};
+
+	float lampVertices[] = {
+	-0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f,  0.5f, -0.5f,
+	 0.5f,  0.5f, -0.5f,
+	-0.5f,  0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+
+	-0.5f, -0.5f,  0.5f,
+	 0.5f, -0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f,  0.5f,
+	-0.5f, -0.5f,  0.5f,
+
+	-0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f, -0.5f,
+	-0.5f, -0.5f,  0.5f,
+	-0.5f,  0.5f,  0.5f,
+
+	 0.5f,  0.5f,  0.5f,
+	 0.5f,  0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,
+
+	-0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f, -0.5f,
+	 0.5f, -0.5f,  0.5f,
+	 0.5f, -0.5f,  0.5f,
+	-0.5f, -0.5f,  0.5f,
+	-0.5f, -0.5f, -0.5f,
+
+	-0.5f,  0.5f, -0.5f,
+	 0.5f,  0.5f, -0.5f,
+	 0.5f,  0.5f,  0.5f,
+	 0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f,  0.5f,
+	-0.5f,  0.5f, -0.5f
 	};
 
 	unsigned int darkTexture;
@@ -100,30 +145,41 @@ int main() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	unsigned int lightVbo, lightVao;
+	glGenVertexArrays(1, &lightVao);
+	glGenBuffers(1, &lightVbo);
+	glBindVertexArray(lightVao);
+	glBindBuffer(GL_ARRAY_BUFFER, lightVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lampVertices), lampVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
 	float boardAngle = 55.0f;
 
 	Shader shader = Shader("./Shaders/plane.vert", "./Shaders/plane.frag");
+	Shader lightShader = Shader("./Shaders/lamp.vert", "./Shaders/lamp.frag");
 
-	glm::vec3 cameraPos = glm::vec3(-0.4f, 0.0f, 9.0f);
-	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-	glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 lampPos = glm::vec3(1.2f, 2.0f, 1.0f);
+	glm::mat4 lampModel = glm::mat4(1.0f);
+	lampModel = glm::translate(lampModel, lampPos);
+	lampModel = glm::scale(lampModel, glm::vec3(0.2f));
+
+	Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 	
-	glm::mat4 view;
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	glm::mat4 view = camera.getViewMatrix();
 
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
@@ -191,19 +247,22 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.16f, 0.65f, 0.85f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBindVertexArray(vao);
+		shader.use();
 		shader.setMat4Uniform("model", model);
 		shader.setMat4Uniform("view", view);
 		shader.setMat4Uniform("projection", projection);
+		shader.setVec3Uniform("lightPos", lampPos);
+		shader.setVec3Uniform("viewPos", camera.position);
 		for (unsigned int i = 0; i < 32; i++) {
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, darkSquares[i]);
 			model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 			shader.setMat4Uniform("model", model);
 			glBindTexture(GL_TEXTURE_2D, darkTexture);
+			glBindVertexArray(vao);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 		for (unsigned int i = 0; i < 32; i++) {
@@ -212,9 +271,15 @@ int main() {
 			model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 			shader.setMat4Uniform("model", model);
 			glBindTexture(GL_TEXTURE_2D, lightTexture);
+			glBindVertexArray(vao);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
-		shader.use();
+		lightShader.use();
+		lightShader.setMat4Uniform("model", lampModel);
+		lightShader.setMat4Uniform("view", view);
+		lightShader.setMat4Uniform("projection", projection);
+		glBindVertexArray(lightVao);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

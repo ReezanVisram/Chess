@@ -30,6 +30,9 @@
     <ClCompile Include="Dependencies\glm\detail\glm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -884,6 +887,9 @@
     <ClInclude Include="Dependencies\glm\vector_relational.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -1297,6 +1303,8 @@
     <None Include="Dependencies\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Shaders\lamp.vert" />
+    <None Include="Shaders\lamp.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\dark.jfif" />

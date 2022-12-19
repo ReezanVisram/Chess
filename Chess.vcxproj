@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Chess.cpp" />
     <ClCompile Include="Dependencies\GLAD\src\glad.c" />
     <ClCompile Include="Dependencies\glm\detail\glm.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="Dependencies\stb_image\src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Dependencies\glm\common.hpp" />
     <ClInclude Include="Dependencies\glm\detail\compute_common.hpp" />
     <ClInclude Include="Dependencies\glm\detail\compute_vector_relational.hpp" />
@@ -575,6 +577,8 @@
     <None Include="Dependencies\glm\gtx\vector_angle.inl" />
     <None Include="Dependencies\glm\gtx\vector_query.inl" />
     <None Include="Dependencies\glm\gtx\wrap.inl" />
+    <None Include="Shaders\lamp.frag" />
+    <None Include="Shaders\lamp.vert" />
     <None Include="Shaders\plane.frag" />
     <None Include="Shaders\plane.vert" />
   </ItemGroup>
