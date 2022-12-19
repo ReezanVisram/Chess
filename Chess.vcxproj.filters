@@ -893,8 +893,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="Shaders\plane.vert" />
-    <None Include="Shaders\plane.frag" />
+    <None Include="Shaders\square.vert" />
+    <None Include="Shaders\square.frag" />
     <None Include="Dependencies\glm\detail\func_common.inl">
       <Filter>Header Files</Filter>
     </None>
@@ -1305,6 +1305,7 @@
     </None>
     <None Include="Shaders\lamp.vert" />
     <None Include="Shaders\lamp.frag" />
+    <None Include="Shaders\border.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\dark.jfif" />

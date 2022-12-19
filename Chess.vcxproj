@@ -577,10 +577,11 @@
     <None Include="Dependencies\glm\gtx\vector_angle.inl" />
     <None Include="Dependencies\glm\gtx\vector_query.inl" />
     <None Include="Dependencies\glm\gtx\wrap.inl" />
+    <None Include="Shaders\border.vert" />
     <None Include="Shaders\lamp.frag" />
     <None Include="Shaders\lamp.vert" />
-    <None Include="Shaders\plane.frag" />
-    <None Include="Shaders\plane.vert" />
+    <None Include="Shaders\square.frag" />
+    <None Include="Shaders\square.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\dark.jfif" />

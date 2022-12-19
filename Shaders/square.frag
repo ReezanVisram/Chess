@@ -10,7 +10,7 @@ uniform vec3 lightPos;
 uniform vec3 viewPos;
 
 void main() {
-	vec3 ambient = 0.3 * texture(ourTexture, TexCoord).rgb;
+	vec3 ambient = 1.0 * texture(ourTexture, TexCoord).rgb;
 
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(lightPos - FragPos);
