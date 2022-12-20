@@ -256,6 +256,13 @@ int main() {
 		squareShader.setMat4Uniform("projection", projection);
 		squareShader.setVec3Uniform("lightPos", lampPos);
 		squareShader.setVec3Uniform("viewPos", camera.position);
+		squareShader.setVec3Uniform("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		squareShader.setVec3Uniform("material.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		squareShader.setVec3Uniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		squareShader.setFloatUniform("material.shininess", 32.0f);
+		squareShader.setVec3Uniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		squareShader.setVec3Uniform("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
+		squareShader.setVec3Uniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 		for (unsigned int i = 0; i < 32; i++) {
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, darkSquares[i]);
