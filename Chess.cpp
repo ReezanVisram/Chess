@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -11,6 +12,7 @@
 #include <assimp/postprocess.h>
 #include "Shader.h"
 #include "Camera.h"
+#include "Model.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
@@ -21,7 +23,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Chess", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1280, 720, "Chess", NULL, NULL);
 
 	if (!window) {
 		std::cerr << "Failed to create GLFW Window" << std::endl;
@@ -37,7 +39,9 @@ int main() {
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
+	stbi_set_flip_vertically_on_load(true);
+
+	glViewport(0, 0, 1280, 720);
 
 	float cubeVertices[] = {
 		// positions          // normals           // texture coords
@@ -107,7 +111,7 @@ int main() {
 	stbi_image_free(darkData);
 
 	glBindTexture(GL_TEXTURE_2D, lightTexture);
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -123,26 +127,6 @@ int main() {
 		std::cerr << "ERROR Failed to load Light Texture" << std::endl;
 	}
 	stbi_image_free(lightData);
-
-	unsigned int borderTexture;
-	glGenTextures(1, &borderTexture);
-	glBindTexture(GL_TEXTURE_2D, borderTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
-	int borderWidth, borderHeight, borderNrChannels;
-	unsigned char* borderData = stbi_load("./Textures/border.jpg", &borderWidth, &borderHeight, &borderNrChannels, 0);
-	if (borderData) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, borderWidth, borderHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, borderData);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cerr << "ERROR Failed to load Border Texture" << std::endl;
-	}
-	stbi_image_free(borderData);
 	unsigned int squaresVbo, squaresVao;
 	glGenVertexArrays(1, &squaresVao);
 	glGenBuffers(1, &squaresVbo);
@@ -160,35 +144,12 @@ int main() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	unsigned int lampVbo, lampVao;
-	glGenVertexArrays(1, &lampVao);
-	glGenBuffers(1, &lampVbo);
-	glBindVertexArray(lampVao);
-	glBindBuffer(GL_ARRAY_BUFFER, lampVbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+	Camera camera(glm::vec3(0.0f, -10.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 50.0f);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	float boardAngle = 0.0f;
 
-	float boardAngle = 55.0f;
-
-	Shader squareShader = Shader("./Shaders/square.vert", "./Shaders/square.frag");
-	Shader lampShader = Shader("./Shaders/lamp.vert", "./Shaders/lamp.frag");
-
-	glm::vec3 lampPos = glm::vec3(1.2f, 2.0f, 1.0f);
-	glm::mat4 lampModel = glm::mat4(1.0f);
-	lampModel = glm::translate(lampModel, lampPos);
-	lampModel = glm::scale(lampModel, glm::vec3(0.2f));
-
-	Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
-
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-
-	glm::mat4 view = camera.getViewMatrix();
-
-	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	glm::mat4 boardModel = glm::mat4(1.0f);
+	boardModel = glm::rotate(boardModel, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	glm::vec3 darkSquares[32];
 	glm::vec3 lightSquares[32];
@@ -245,21 +206,41 @@ int main() {
 		}
 	}
 
+	glm::mat4 kingModel = glm::mat4(1.0f);
+	kingModel = glm::translate(kingModel, glm::vec3(0.0f, -3.0f, 0.0f));
+	kingModel = glm::rotate(kingModel, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	kingModel = glm::scale(kingModel, glm::vec3(0.05f, 0.05f, 0.05f));
+
+	glm::mat4 queenModel = glm::mat4(1.0f);
+	queenModel = glm::translate(queenModel, glm::vec3(-1.0f, -3.0f, 0.0f));
+	queenModel = glm::rotate(queenModel, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	queenModel = glm::scale(queenModel, glm::vec3(0.05f, 0.05f, 0.05f));
+
+	glm::mat4 view = camera.getViewMatrix();
+
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
+
+	Model king("Assets/Chess/Light/King/King.obj");
+	Model queen("Assets/Chess/Light/Queen/Queen.obj");
+	Shader chessShader("./Shaders/chesset.vert", "./Shaders/chesset.frag");
+	Shader squareShader = Shader("./Shaders/square.vert", "./Shaders/square.frag");
+
 	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.094f, 0.125f, 0.47f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		squareShader.use();
-		squareShader.setMat4Uniform("model", model);
+		squareShader.setMat4Uniform("model", boardModel);
 		squareShader.setMat4Uniform("view", view);
 		squareShader.setMat4Uniform("projection", projection);
-		squareShader.setVec3Uniform("lightPos", lampPos);
+		squareShader.setVec3Uniform("lightPos", glm::vec3(0.0f, -3.5f, 1.0f));
 		squareShader.setVec3Uniform("viewPos", camera.position);
 		squareShader.setVec3Uniform("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
 		squareShader.setVec3Uniform("material.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
 		squareShader.setVec3Uniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-		squareShader.setFloatUniform("material.shininess", 32.0f);
+		squareShader.setFloatUniform("material.shininess", 4.0f);
 		squareShader.setVec3Uniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
 		squareShader.setVec3Uniform("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
 		squareShader.setVec3Uniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -281,12 +262,21 @@ int main() {
 			glBindVertexArray(squaresVao);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		lampShader.use();
-		lampShader.setMat4Uniform("model", lampModel);
-		lampShader.setMat4Uniform("view", view);
-		lampShader.setMat4Uniform("projection", projection);
-		glBindVertexArray(lampVao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		chessShader.use();
+		chessShader.setMat4Uniform("model", kingModel);
+		chessShader.setMat4Uniform("view", view);
+		chessShader.setMat4Uniform("projection", projection);
+		chessShader.setVec3Uniform("light.position", glm::vec3(0.0f, -4.0f, 1.0f));
+		chessShader.setVec3Uniform("light.ambient", glm::vec3(0.6f, 0.6f, 0.6f));
+		chessShader.setVec3Uniform("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+		chessShader.setVec3Uniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		chessShader.setVec3Uniform("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+		chessShader.setVec3Uniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		chessShader.setVec3Uniform("material.shininess", glm::vec3(32.0f));
+		chessShader.setVec3Uniform("viewPos", camera.position);
+		king.Draw(chessShader);
+		chessShader.setMat4Uniform("model", queenModel);
+		queen.Draw(chessShader);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

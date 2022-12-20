@@ -122,10 +122,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\stb_image\include;$(SolutionDir)Dependencies\assimp\include;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)Dependencies\assimp\lib-vc2022</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mt.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,12 +139,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\stb_image\include;$(SolutionDir)Dependencies\assimp\include;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)Dependencies\assimp\lib-vc2022</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mt.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -150,10 +156,12 @@
     <ClCompile Include="Dependencies\GLAD\src\glad.c" />
     <ClCompile Include="Dependencies\glm\detail\glm.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Dependencies\stb_image\src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Board.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Dependencies\assimp\include\assimp\aabb.h" />
     <ClInclude Include="Dependencies\assimp\include\assimp\ai_assert.h" />
@@ -520,6 +528,8 @@
     <ClInclude Include="Dependencies\glm\vec4.hpp" />
     <ClInclude Include="Dependencies\glm\vector_relational.hpp" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="Piece.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Dependencies\stb_image\include\stb_image.h" />
   </ItemGroup>
@@ -672,6 +682,8 @@
     <None Include="Dependencies\glm\gtx\vector_query.inl" />
     <None Include="Dependencies\glm\gtx\wrap.inl" />
     <None Include="Shaders\border.vert" />
+    <None Include="Shaders\chesset.frag" />
+    <None Include="Shaders\chesset.vert" />
     <None Include="Shaders\lamp.frag" />
     <None Include="Shaders\lamp.vert" />
     <None Include="Shaders\square.frag" />
