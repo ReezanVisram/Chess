@@ -12,7 +12,6 @@
 
 class Piece {
 public:
-	unsigned int objectId;
 	char file;
 	char rank;
 	Model model;
@@ -24,7 +23,7 @@ public:
 	Light light;
 	Material material;
 
-	Piece(char file, char rank, const char* modelPath, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, const char* pickingVertexShaderPath, const char* pickingFragmentShaderPath, Camera camera, Light light, Material material);
+	Piece(char file, char rank, const char* modelPath, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material);
 	Piece() = default;
 	void Draw();
 

@@ -1,7 +1,7 @@
 #include <map>
 #include "Piece.h"
 
-Piece::Piece(char file, char rank, const char* modelPath, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, const char* pickingVertexShaderPath, const char* pickingFragmentShaderPath, Camera camera, Light light, Material material) {
+Piece::Piece(char file, char rank, const char* modelPath, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material) {
 	this->file = file;
 	this->rank = rank;
 	this->model = Model(modelPath);
@@ -33,10 +33,6 @@ void Piece::Draw() {
 	renderShader.setFloatUniform("material.shininess", material.shininess);
 
 	model.Draw(renderShader);
-}
-
-void Piece::setObjectId(unsigned int id) {
-	objectId = id;
 }
 
 glm::vec3 Piece::squareToVector() {

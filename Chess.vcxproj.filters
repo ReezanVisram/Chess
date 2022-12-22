@@ -1628,8 +1628,6 @@
     </None>
     <None Include="Shaders\chesset.vert" />
     <None Include="Shaders\chesset.frag" />
-    <None Include="Shaders\picking.vert" />
-    <None Include="Shaders\picking.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\dark.jfif" />

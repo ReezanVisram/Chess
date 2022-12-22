@@ -696,8 +696,6 @@
     <None Include="Shaders\chesset.vert" />
     <None Include="Shaders\lamp.frag" />
     <None Include="Shaders\lamp.vert" />
-    <None Include="Shaders\picking.frag" />
-    <None Include="Shaders\picking.vert" />
     <None Include="Shaders\square.frag" />
     <None Include="Shaders\square.vert" />
   </ItemGroup>

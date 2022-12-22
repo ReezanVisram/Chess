@@ -9,7 +9,7 @@
 #include "Queen.h"
 #include "King.h"
 
-Board::Board(const char* darkSquareTexturePath, const char* lightSquareTexturePath, float boardAngle, glm::vec3 startingPoint, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, const char* pickingVertexShaderPath, const char* pickingFragmentShaderPath, Camera camera, Light light, Material material) {
+Board::Board(const char* darkSquareTexturePath, const char* lightSquareTexturePath, float boardAngle, glm::vec3 startingPoint, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material) {
 	this->viewMatrix = camera.getViewMatrix();
 	this->projectionMatrix = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);;
 	this->darkSquareTexturePath = darkSquareTexturePath;
@@ -17,7 +17,6 @@ Board::Board(const char* darkSquareTexturePath, const char* lightSquareTexturePa
 	this->boardAngle = boardAngle;
 	this->startingPoint = startingPoint;
 	this->renderShader = Shader(renderVertexShaderPath, renderFragmentShaderPath);
-	this->pickingShader = Shader(pickingVertexShaderPath, pickingFragmentShaderPath);
 	this->camera = camera;
 	this->light = light;
 	this->material = material;
@@ -70,63 +69,20 @@ Board::Board(const char* darkSquareTexturePath, const char* lightSquareTexturePa
 	std::map<int, char> indexToFile = { {0, 'a'}, {1, 'b'}, {2, 'c'}, {3, 'd'}, {4, 'e'}, {5, 'f'}, {6, 'g'}, {7, 'h'} };
 
 	for (int i = 0; i < 8; i++) {
-		pieces[i] = Pawn(indexToFile[i], '2', "Assets/Chess/Light/Pawn/Pawn.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
-		pieces[i].setObjectId(i + 1);
+		pieces[i] = Pawn(indexToFile[i], '2', "Assets/Chess/Light/Pawn/Pawn.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
 	}
 
-	pieces[8] = Rook('a', '1', "Assets/Chess/Light/Rook/Rook.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
-	pieces[9] = Rook('h', '1', "Assets/Chess/Light/Rook/Rook.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
-	pieces[10] = Knight('b', '1', "Assets/Chess/Light/Knight/Knight.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
-	pieces[11] = Knight('g', '1', "Assets/Chess/Light/Knight/Knight.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
-	pieces[12] = Bishop('c', '1', "Assets/Chess/Light/Bishop/Bishop.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
-	pieces[13] = Bishop('f', '1', "Assets/Chess/Light/Bishop/Bishop.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
-	pieces[14] = Queen('d', '1', "Assets/Chess/Light/Queen/Queen.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
-	pieces[15] = Bishop('e', '1', "Assets/Chess/Light/King/King.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, material);
+	pieces[8] = Rook('a', '1', "Assets/Chess/Light/Rook/Rook.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
+	pieces[9] = Rook('h', '1', "Assets/Chess/Light/Rook/Rook.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
+	pieces[10] = Knight('b', '1', "Assets/Chess/Light/Knight/Knight.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
+	pieces[11] = Knight('g', '1', "Assets/Chess/Light/Knight/Knight.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
+	pieces[12] = Bishop('c', '1', "Assets/Chess/Light/Bishop/Bishop.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
+	pieces[13] = Bishop('f', '1', "Assets/Chess/Light/Bishop/Bishop.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
+	pieces[14] = Queen('d', '1', "Assets/Chess/Light/Queen/Queen.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
+	pieces[15] = Bishop('e', '1', "Assets/Chess/Light/King/King.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
 }
 
 void Board::Draw() {
-	renderShader.use();
-	renderShader.setMat4Uniform("view", viewMatrix);
-	renderShader.setMat4Uniform("projection", projectionMatrix);
-	renderShader.setVec3Uniform("viewPos", camera.position);
-	renderShader.setVec3Uniform("material.ambient", material.ambient);
-	renderShader.setVec3Uniform("material.diffuse", material.diffuse);
-	renderShader.setVec3Uniform("material.specular", material.specular);
-	renderShader.setFloatUniform("material.shininess", 4.0f);
-	renderShader.setVec3Uniform("light.position", light.position);
-	renderShader.setVec3Uniform("light.ambient", light.ambient);
-	renderShader.setVec3Uniform("light.diffuse", light.diffuse);
-	renderShader.setVec3Uniform("light.specular", light.specular);
-
-	// Dark squares
-	for (unsigned int i = 0; i < 32; i++) {
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, darkSquares[i]);
-		model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-		renderShader.setMat4Uniform("model", model);
-		glBindTexture(GL_TEXTURE_2D, darkTexture);
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
-
-	// Light squares
-	for (unsigned int i = 0; i < 32; i++) {
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, lightSquares[i]);
-		model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-		renderShader.setMat4Uniform("model", model);
-		glBindTexture(GL_TEXTURE_2D, lightTexture);
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
-
-	// Pieces
-	for (int i = 0; i < 16; i++) {
-		pieces[i].Draw();
-	}
-}
-
-void Board::Draw(bool isPicking) {
 	renderShader.use();
 	renderShader.setMat4Uniform("view", viewMatrix);
 	renderShader.setMat4Uniform("projection", projectionMatrix);

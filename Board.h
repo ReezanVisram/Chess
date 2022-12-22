@@ -25,16 +25,14 @@ public:
 
 	Camera camera;
 	Shader renderShader;
-	Shader pickingShader;
 	Light light;
 	Material material;
 
 	unsigned int vao;
 	unsigned int vbo;
 
-	Board(const char* darkSquareTexturePath, const char* lightSquareTexturePath, float boardAngle, glm::vec3 startingPoint, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, const char* pickingVertexShaderPath, const char* pickingFragmentShaderPath, Camera camera, Light light, Material material);
+	Board(const char* darkSquareTexturePath, const char* lightSquareTexturePath, float boardAngle, glm::vec3 startingPoint, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material);
 	void Draw();
-	void Draw(bool isPicking);
 private:
 	void initializeBoard();
 };
