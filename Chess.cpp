@@ -13,8 +13,12 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Light.h"
+#include "Piece.h"
+#include "Board.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void cursor_position_callback(GLFWwindow* window, double xPos, double yPos);
 void process_input(GLFWwindow* window);
 
 int main() {
@@ -22,6 +26,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	GLFWwindow* window = glfwCreateWindow(1280, 720, "Chess", NULL, NULL);
 
@@ -32,7 +37,7 @@ int main() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, framebuffer_size_callback);
-
+	glfwSetCursorPosCallback(window, cursor_position_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cerr << "Failed to initialize GLAD" << std::endl;
@@ -43,246 +48,68 @@ int main() {
 
 	glViewport(0, 0, 1280, 720);
 
-	float cubeVertices[] = {
-		// positions          // normals           // texture coords
-		-0.5f, -0.5f, -0.15f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.15f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.15f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.15f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.15f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.15f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-
-		-0.5f, -0.5f,  0.15f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-		 0.5f, -0.5f,  0.15f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-		 0.5f,  0.5f,  0.15f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-		 0.5f,  0.5f,  0.15f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-		-0.5f,  0.5f,  0.15f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-		-0.5f, -0.5f,  0.15f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-
-		-0.5f,  0.5f,  0.15f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.15f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.15f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.15f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.15f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.15f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-		 0.5f,  0.5f,  0.15f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.15f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.15f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.15f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.15f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.15f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.15f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.15f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.15f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.15f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.15f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.15f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.15f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.15f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.15f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.15f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.15f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.15f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+	Material wood = {
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(0.5f, 0.5, 0.5f),
+		4.0
 	};
 
-	unsigned int darkTexture;
-	unsigned int lightTexture;
-	glGenTextures(1, &darkTexture);
-	glGenTextures(1, &lightTexture);
-	glBindTexture(GL_TEXTURE_2D, darkTexture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	int darkWidth, darkHeight, darkNrChannels;
-	unsigned char* darkData = stbi_load("./Textures/dark.jpg", &darkWidth, &darkHeight, &darkNrChannels, 0);
-	if (darkData) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, darkWidth, darkHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, darkData);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cerr << "ERROR Failed to load Dark Texture" << std::endl;
-	}
-	stbi_image_free(darkData);
-
-	glBindTexture(GL_TEXTURE_2D, lightTexture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	int lightWidth, lightHeight, lightNrChannels;
-	unsigned char* lightData = stbi_load("./Textures/light.jfif", &lightWidth, &lightHeight, &lightNrChannels, 0);
-	if (lightData) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, lightWidth, lightHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, lightData);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cerr << "ERROR Failed to load Light Texture" << std::endl;
-	}
-	stbi_image_free(lightData);
-	unsigned int squaresVbo, squaresVao;
-	glGenVertexArrays(1, &squaresVao);
-	glGenBuffers(1, &squaresVbo);
-
-	glBindVertexArray(squaresVao);
-	glBindBuffer(GL_ARRAY_BUFFER, squaresVbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 	Camera camera(glm::vec3(0.0f, -10.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 50.0f);
+	Light light = Light(glm::vec3(2.0f, 4.0f, 4.0f), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f));
+	Board board("./Textures/dark.jpg", "./Textures/light.jpg", 0.0f, glm::vec3(-4.0f, -3.0f, 0.0f), "./Shaders/square.vert", "./Shaders/square.frag", "./Shaders/picking.vert", "./Shaders/picking.frag", camera, light, wood);
 
-	float boardAngle = 0.0f;
+	// Create the framebuffer
+	unsigned int fbo;
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	glm::mat4 boardModel = glm::mat4(1.0f);
-	boardModel = glm::rotate(boardModel, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+	// Create the picking texture
+	unsigned int pickingTexture;
+	glGenTextures(1, &pickingTexture);
+	glBindTexture(GL_TEXTURE_2D, pickingTexture);
 
-	glm::vec3 darkSquares[32];
-	glm::vec3 lightSquares[32];
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32UI, 1280, 720, 0, GL_RGB_INTEGER, GL_UNSIGNED_INT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pickingTexture, 0);
 
-	float originalX = -4.0f;
-	float x2 = -3.0f;
-	float originalY = -3.0f;
-	float originalZ = 0.0f;
+	// Create the texture object for the depth buffer
+	unsigned int depthTexture;
+	glGenTextures(1, &depthTexture);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1280, 720, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
 
-	float darkX = originalX;
-	float darkY = originalY;
-	float darkZ = originalZ;
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	float lightX = originalX;
-	float lightY = originalY + glm::cos(glm::radians(boardAngle));
-	float lightZ = originalZ - glm::sin(glm::radians(boardAngle));
-
-	for (int i = 0; i < 32; i++) {
-		darkSquares[i] = glm::vec3(darkX, darkY, darkZ);
-
-		darkY += glm::cos(glm::radians(boardAngle));
-		darkY += glm::cos(glm::radians(boardAngle));
-		darkZ -= glm::sin(glm::radians(boardAngle));
-		darkZ -= glm::sin(glm::radians(boardAngle));
-
-		if (i % 8 == 3) {
-			darkX += 1;
-			darkY = originalY + glm::cos(glm::radians(boardAngle));
-			darkZ = originalZ - glm::sin(glm::radians(boardAngle));
-		}
-		else if (i % 8 == 7) {
-			darkX += 1;
-			darkY = originalY;
-			darkZ = originalZ;
-		}
-	}
-
-	for (int i = 0; i < 32; i++) {
-		lightSquares[i] = glm::vec3(lightX, lightY, lightZ);
-		lightY += glm::cos(glm::radians(boardAngle));
-		lightY += glm::cos(glm::radians(boardAngle));
-		lightZ -= glm::sin(glm::radians(boardAngle));
-		lightZ -= glm::sin(glm::radians(boardAngle));
-
-		if (i % 8 == 3) {
-			lightX += 1;
-			lightY = originalY;
-			lightZ = originalZ;
-		}
-		else if (i % 8 == 7) {
-			lightX += 1;
-			lightY = originalY + glm::cos(glm::radians(boardAngle));
-			lightZ = originalZ - glm::sin(glm::radians(boardAngle));
-		}
-	}
-
-	glm::mat4 kingModel = glm::mat4(1.0f);
-	kingModel = glm::translate(kingModel, glm::vec3(0.0f, -3.0f, 0.0f));
-	kingModel = glm::rotate(kingModel, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	kingModel = glm::scale(kingModel, glm::vec3(0.05f, 0.05f, 0.05f));
-
-	glm::mat4 queenModel = glm::mat4(1.0f);
-	queenModel = glm::translate(queenModel, glm::vec3(-1.0f, -3.0f, 0.0f));
-	queenModel = glm::rotate(queenModel, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	queenModel = glm::scale(queenModel, glm::vec3(0.05f, 0.05f, 0.05f));
-
-	glm::mat4 view = camera.getViewMatrix();
-
-	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
-
-	Model king("Assets/Chess/Light/King/King.obj");
-	Model queen("Assets/Chess/Light/Queen/Queen.obj");
-	Shader chessShader("./Shaders/chesset.vert", "./Shaders/chesset.frag");
-	Shader squareShader = Shader("./Shaders/square.vert", "./Shaders/square.frag");
+	Shader picking("./Shaders/picking.vert", "./Shaders/picking.frag");
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.094f, 0.125f, 0.47f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		squareShader.use();
-		squareShader.setMat4Uniform("model", boardModel);
-		squareShader.setMat4Uniform("view", view);
-		squareShader.setMat4Uniform("projection", projection);
-		squareShader.setVec3Uniform("lightPos", glm::vec3(0.0f, -3.5f, 1.0f));
-		squareShader.setVec3Uniform("viewPos", camera.position);
-		squareShader.setVec3Uniform("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		squareShader.setVec3Uniform("material.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		squareShader.setVec3Uniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-		squareShader.setFloatUniform("material.shininess", 4.0f);
-		squareShader.setVec3Uniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-		squareShader.setVec3Uniform("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
-		squareShader.setVec3Uniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-		for (unsigned int i = 0; i < 32; i++) {
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, darkSquares[i]);
-			model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-			squareShader.setMat4Uniform("model", model);
-			glBindTexture(GL_TEXTURE_2D, darkTexture);
-			glBindVertexArray(squaresVao);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-		for (unsigned int i = 0; i < 32; i++) {
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, lightSquares[i]);
-			model = glm::rotate(model, glm::radians(-boardAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-			squareShader.setMat4Uniform("model", model);
-			glBindTexture(GL_TEXTURE_2D, lightTexture);
-			glBindVertexArray(squaresVao);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-		chessShader.use();
-		chessShader.setMat4Uniform("model", kingModel);
-		chessShader.setMat4Uniform("view", view);
-		chessShader.setMat4Uniform("projection", projection);
-		chessShader.setVec3Uniform("light.position", glm::vec3(0.0f, -4.0f, 1.0f));
-		chessShader.setVec3Uniform("light.ambient", glm::vec3(0.6f, 0.6f, 0.6f));
-		chessShader.setVec3Uniform("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-		chessShader.setVec3Uniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-		chessShader.setVec3Uniform("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
-		chessShader.setVec3Uniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-		chessShader.setVec3Uniform("material.shininess", glm::vec3(32.0f));
-		chessShader.setVec3Uniform("viewPos", camera.position);
-		king.Draw(chessShader);
-		chessShader.setMat4Uniform("model", queenModel);
-		queen.Draw(chessShader);
+		// Picking phase
+		board.Draw(true);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
 	glfwTerminate();
 	return 0;
+}
+
+void cursor_position_callback(GLFWwindow* window, double xPos, double yPos) {
+	std::cout << "Mouse is at (" << xPos << ", " << yPos << ") in screen coordinates\n";
+	glm::vec3 win = glm::vec3(xPos, yPos, 0);
+	glm::vec4 viewport = glm::vec4(0, 0, 1280, 720);
+
+	glm::vec3 worldPos = glm::unProject(win, glm::mat4(1.0f), glm::mat4(1.0f), viewport);
+
+	std::cout << "Mouse is at (" << worldPos.x << ", " << worldPos.y << ") in world coordinates" << std::endl;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
