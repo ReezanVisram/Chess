@@ -25,18 +25,17 @@ public:
 
 	float leftmostX;
 	float rightmostX;
-	float hitboxRadius;
+	float hitboxRadius = 0.25f;
 
+	bool isSelected;
 
 	Piece(char file, char rank, const char* modelPath, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material);
 	Piece() = default;
 	void Draw(glm::vec3 mouseRay);
 
-	void setObjectId(unsigned int id);
 private:
 	glm::vec3 squareToVector();
 	bool calculateIntersection(glm::vec3 mouseRay);
-	void drawBoundingBox();
 };
 
 

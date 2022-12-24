@@ -6,35 +6,26 @@
 #include "Piece.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "Square.h"
 
 class Board {
 public:
-	glm::mat4 viewMatrix;
-	glm::mat4 projectionMatrix;
-	Piece pieces[32];
-	const char* darkSquareTexturePath;
-	const char* lightSquareTexturePath;
-	float boardAngle;
-	glm::vec3 darkSquares[32];
-	glm::vec3 lightSquares[32];
+	Square m_Squares[64];
 
-	glm::vec3 startingPoint;
+	// OpenGL Information
+	glm::mat4 m_GL_ViewMatrix;
+	glm::vec3 m_GL_StartingPoint;
+	Camera *m_GL_Camera;
+	Light *m_GL_Light;
+	Material *m_GL_Material;
+	glm::mat4* m_GL_ProjectionMatrix;
 
-	unsigned int darkTexture;
-	unsigned int lightTexture;
+	std::string m_TexturesDirectory;
+	std::string m_ShadersDirectory;
 
-	Camera camera;
-	Shader renderShader;
-	Light light;
-	Material material;
-
-	unsigned int vao;
-	unsigned int vbo;
-
-	Board(const char* darkSquareTexturePath, const char* lightSquareTexturePath, float boardAngle, glm::vec3 startingPoint, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material);
+	Board(std::string texturesDirectory, glm::vec3 startingPoint, std::string shadersDirectory, glm::mat4 *projectionMatrix, Camera *camera, Light *light, Material *material);
+	Board() = default;
 	void Draw(glm::vec3 mouseRay);
-private:
-	void initializeBoard();
 };
 
 

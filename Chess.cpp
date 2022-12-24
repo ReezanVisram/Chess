@@ -17,6 +17,7 @@
 #include "Piece.h"
 #include "Board.h"
 #include "MousePicker.h"
+#include "Scene.h"
 
 void cursor_position_callback(GLFWwindow* window, double xPos, double yPos);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -64,7 +65,8 @@ int main() {
 
 	
 	Light light = Light(glm::vec3(2.0f, 4.0f, 4.0f), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f));
-	Board board("./Textures/dark.jpg", "./Textures/light.jpg", 0.0f, glm::vec3(-4.0f, -3.0f, 0.0f), "./Shaders/square.vert", "./Shaders/square.frag", camera, light, wood);
+
+	Scene scene = Scene(window, camera, light, projectionMatrix, "./Textures", "./Shaders");
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
@@ -73,7 +75,7 @@ int main() {
 		glClearColor(0.094f, 0.125f, 0.47f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glm::vec3 mouseRay = mousePicker.currentRay;
-		board.Draw(mouseRay);
+		scene.Draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
