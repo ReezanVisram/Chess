@@ -11,7 +11,7 @@
 
 Board::Board(const char* darkSquareTexturePath, const char* lightSquareTexturePath, float boardAngle, glm::vec3 startingPoint, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material) {
 	this->viewMatrix = camera.getViewMatrix();
-	this->projectionMatrix = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);;
+	this->projectionMatrix = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
 	this->darkSquareTexturePath = darkSquareTexturePath;
 	this->lightSquareTexturePath = lightSquareTexturePath;
 	this->boardAngle = boardAngle;
@@ -72,6 +72,7 @@ Board::Board(const char* darkSquareTexturePath, const char* lightSquareTexturePa
 		pieces[i] = Pawn(indexToFile[i], '2', "Assets/Chess/Light/Pawn/Pawn.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
 	}
 
+
 	pieces[8] = Rook('a', '1', "Assets/Chess/Light/Rook/Rook.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
 	pieces[9] = Rook('h', '1', "Assets/Chess/Light/Rook/Rook.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
 	pieces[10] = Knight('b', '1', "Assets/Chess/Light/Knight/Knight.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
@@ -82,7 +83,7 @@ Board::Board(const char* darkSquareTexturePath, const char* lightSquareTexturePa
 	pieces[15] = Bishop('e', '1', "Assets/Chess/Light/King/King.obj", "./Shaders/chesset.vert", "./Shaders/chesset.frag", camera, light, material);
 }
 
-void Board::Draw() {
+void Board::Draw(glm::vec3 mouseRay) {
 	renderShader.use();
 	renderShader.setMat4Uniform("view", viewMatrix);
 	renderShader.setMat4Uniform("projection", projectionMatrix);
@@ -120,7 +121,7 @@ void Board::Draw() {
 
 	// Pieces
 	for (int i = 0; i < 16; i++) {
-		pieces[i].Draw();
+		pieces[i].Draw(mouseRay);
 	}
 }
 

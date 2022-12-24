@@ -57,6 +57,30 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 		vector.z = mesh->mVertices[i].z;
 		vertex.Position = vector;
 
+		if (vector.x < minVertexPos.x) {
+			minVertexPos.x = vector.x;
+		}
+
+		if (vector.y < minVertexPos.y) {
+			minVertexPos.y = vector.y;
+		}
+
+		if (vector.z < minVertexPos.z) {
+			minVertexPos.z = vector.z;
+		}
+
+		if (vector.x > maxVertexPos.x) {
+			maxVertexPos.x = vector.x;
+		}
+
+		if (vector.y > maxVertexPos.y) {
+			maxVertexPos.y = vector.y;
+		}
+
+		if (vector.x > maxVertexPos.z) {
+			maxVertexPos.z = vector.z;
+		}
+
 		// Vertex normals
 		if (mesh->HasNormals()) {
 			vector.x = mesh->mNormals[i].x;
@@ -128,10 +152,13 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 	return textures;
 }
 
+std::vector<Mesh> Model::getMeshes() const {
+	return meshes;
+}
+
 unsigned int TextureFromFile(const char* path, const std::string& directory) {
 	std::string filename = std::string(path);
 	filename = directory + "/" + filename;
-	std::cout << "Filename: " << filename << std::endl;
 
 	unsigned int id;
 	glGenTextures(1, &id);

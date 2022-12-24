@@ -16,9 +16,16 @@
 #include "Light.h"
 #include "Piece.h"
 #include "Board.h"
+#include "MousePicker.h"
 
+void cursor_position_callback(GLFWwindow* window, double xPos, double yPos);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void process_input(GLFWwindow* window);
+
+Camera camera(glm::vec3(0.0f, -10.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 50.0f);
+glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
+MousePicker mousePicker = MousePicker(camera, projectionMatrix);
 
 int main() {
 	glfwInit();
@@ -36,6 +43,8 @@ int main() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cerr << "Failed to initialize GLAD" << std::endl;
@@ -53,7 +62,7 @@ int main() {
 		4.0
 	};
 
-	Camera camera(glm::vec3(0.0f, -10.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 50.0f);
+	
 	Light light = Light(glm::vec3(2.0f, 4.0f, 4.0f), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f));
 	Board board("./Textures/dark.jpg", "./Textures/light.jpg", 0.0f, glm::vec3(-4.0f, -3.0f, 0.0f), "./Shaders/square.vert", "./Shaders/square.frag", camera, light, wood);
 
@@ -63,13 +72,23 @@ int main() {
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.094f, 0.125f, 0.47f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		board.Draw();
+		glm::vec3 mouseRay = mousePicker.currentRay;
+		board.Draw(mouseRay);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
 	glfwTerminate();
 	return 0;
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		std::cout << "Current mouse ray: (" << mousePicker.currentRay.x << ", " << mousePicker.currentRay.y << ", " << mousePicker.currentRay.z << ").\n";
+}
+
+void cursor_position_callback(GLFWwindow* window, double xPos, double yPos) {
+	mousePicker.update((float)xPos, (float)yPos);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {

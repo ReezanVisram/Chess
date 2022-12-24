@@ -23,6 +23,11 @@ public:
 	Model() = default;
 	void Draw(Shader &shader);
 
+	std::vector<Mesh> getMeshes() const;
+
+	glm::vec3 minVertexPos = glm::vec3(10000.0f, 10000.0f, 10000.0f);
+	glm::vec3 maxVertexPos = glm::vec3(-10000.0f, -10000.0f, -10000.0f);
+
 private:
 	std::vector<Mesh> meshes;
 	std::string directory;

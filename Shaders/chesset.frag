@@ -24,6 +24,7 @@ uniform vec3 viewPos;
 
 uniform Material material;
 uniform Light light;
+uniform bool isIntersecting;
 
 void main() {
 	// ambient
@@ -43,5 +44,11 @@ void main() {
 	vec3 specular = light.specular * spec * texture(material.diffuse, TexCoord).rgb;
 
 	vec3 result = ambient + diffuse + specular;
-	FragColor = vec4(result, 1.0);
+	vec3 normFragPos = normalize(FragPos);
+
+	if (isIntersecting) {
+		FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	} else {
+		FragColor = vec4(result, 1.0);
+	}
 }

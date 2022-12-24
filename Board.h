@@ -32,7 +32,7 @@ public:
 	unsigned int vbo;
 
 	Board(const char* darkSquareTexturePath, const char* lightSquareTexturePath, float boardAngle, glm::vec3 startingPoint, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material);
-	void Draw();
+	void Draw(glm::vec3 mouseRay);
 private:
 	void initializeBoard();
 };
