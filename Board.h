@@ -10,7 +10,8 @@
 
 class Board {
 public:
-	Square m_Squares[64];
+	Square* m_Squares = new Square[64];
+	Piece *m_Pieces = new Piece[32];
 
 	// OpenGL Information
 	glm::mat4 m_GL_ViewMatrix;
@@ -26,6 +27,10 @@ public:
 	Board(std::string texturesDirectory, glm::vec3 startingPoint, std::string shadersDirectory, glm::mat4 *projectionMatrix, Camera *camera, Light *light, Material *material);
 	Board() = default;
 	void Draw(glm::vec3 mouseRay);
+	void LoadPositionFromFen(std::string fenString);
+
+private:
+	void generateStartingPieces();
 };
 
 

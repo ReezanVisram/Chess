@@ -22,10 +22,44 @@ Board::Board(std::string texturesDirectory, glm::vec3 startingPoint, std::string
 			i++;
 		}
 	}
+	LoadPositionFromFen("r1bqk2r/pppp1pp1/5n1p/2b1P3/3n3B/2N5/PPP2PPP/R2QKB1R b KQkq - 0 8");
 }
 
 void Board::Draw(glm::vec3 mouseRay) {
 	for (int i = 0; i < 64; i++) {
-		m_Squares[i].Draw();
+		m_Squares[i].Draw(mouseRay);
+	}
+}
+
+void Board::LoadPositionFromFen(std::string fenString) {
+	std::map<char, Type> charToPiece = { {'r', Rook}, {'n', Knight}, {'b', Bishop}, {'q', Queen}, {'k', King}, {'p', Pawn} };
+
+	int file = 0;
+	int rank = 7;
+
+	int i = 0;
+	std::string delimiter = " ";
+	std::string fen = fenString.substr(0, fenString.find(delimiter)); 
+	for (auto& symbol : fen) {
+		if (symbol == '/') {
+			file = 0;
+			rank--;
+		}
+		else {
+			if (isdigit(symbol)) {
+				file += symbol - '0';
+			}
+			else {
+				Color pieceColor = Black;
+				if (isupper(symbol)) {
+					pieceColor = White;
+				}
+				Type pieceType = charToPiece[tolower(symbol)];
+				m_Pieces[i] = Piece((m_ShadersDirectory + "/chesset.vert").c_str(), (m_ShadersDirectory + "/chesset.frag").c_str(), pieceColor, pieceType, m_GL_ProjectionMatrix, m_GL_Camera, m_GL_Light, m_GL_Material);
+				m_Squares[file * 8 + rank].m_Piece = &m_Pieces[i];
+				file++;
+				i++;
+			}
+		}
 	}
 }

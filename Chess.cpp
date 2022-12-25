@@ -75,7 +75,7 @@ int main() {
 		glClearColor(0.094f, 0.125f, 0.47f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glm::vec3 mouseRay = mousePicker.currentRay;
-		scene.Draw();
+		scene.Draw(mouseRay);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

@@ -13,11 +13,13 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Model.h"
+#include "Piece.h"
 
 class Square {
 public:
 	unsigned int m_File;
 	unsigned int m_Rank;
+	Piece *m_Piece = nullptr;
 
 	// OpenGL Information
 	bool m_GL_IsLight;
@@ -34,11 +36,10 @@ public:
 	Light* m_GL_Light;
 	Material* m_GL_Material;
 
-
 	Square() = default;
 	Square(const char* darkTexturePath, const char* lightTexturePath, const char* vertexShaderPath, const char* fragmentShaderPath, unsigned int file, unsigned int rank, bool isLight, glm::vec3 position, glm::mat4* projectionMatrix, Camera *camera, Light *light, Material *material);
 
-	void Draw();
+	void Draw(glm::vec3 mouseRay);
 
 private:
 	void prepareDrawing();

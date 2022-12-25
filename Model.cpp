@@ -159,6 +159,7 @@ std::vector<Mesh> Model::getMeshes() const {
 unsigned int TextureFromFile(const char* path, const std::string& directory) {
 	std::string filename = std::string(path);
 	filename = directory + "/" + filename;
+	// std::cout << "Filename: " << filename << std::endl;
 
 	unsigned int id;
 	glGenTextures(1, &id);

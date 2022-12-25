@@ -25,13 +25,12 @@ public:
 	std::string m_TexturesDirectory;
 	std::string m_ShadersDirectory;
 
-	Board m_Board;
+	Board* m_Board;
 	Scene() = default;
 	Scene(GLFWwindow* window, Camera camera, Light light, glm::mat4 sceneProjectionMatrix, std::string texturesDirectory, std::string shadersDirectory);
 
-	void Draw();
+	void Draw(glm::vec3 mouseRay);
 private:
-	Board createBoard();
 };
 
 #endif

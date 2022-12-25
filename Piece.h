@@ -10,32 +10,46 @@
 #include "Light.h"
 #include "Camera.h"
 
+enum Type {
+	Rook,
+	Knight,
+	Bishop,
+	Queen,
+	King,
+	Pawn
+};
+
+enum Color {
+	Black,
+	White
+};
+
 class Piece {
 public:
-	char file;
-	char rank;
-	Model model;
-	glm::mat4 modelMatrix;
-	glm::mat4 viewMatrix;
-	glm::mat4 projectionMatrix;
-	Camera camera;
-	Shader renderShader;
-	Light light;
-	Material material;
+	// Piece Information
+	Type m_Type;
+	Color m_Color;
 
-	float leftmostX;
-	float rightmostX;
-	float hitboxRadius = 0.25f;
+	// OpenGL Information
+	Model m_GL_Model;
+	glm::vec3 m_Position;
+	bool m_GL_isSelected;
+	float m_GL_HitboxRadius = 0.25f;
+	glm::mat4 m_GL_ModelMatrix;
+	glm::mat4 m_GL_ViewMatrix;
+	glm::mat4* m_GL_ProjectionMatrix;
+	Camera* m_GL_Camera;
+	Light* m_GL_Light;
+	Material* m_GL_Material;
+	Shader m_GL_Shader;
 
-	bool isSelected;
-
-	Piece(char file, char rank, const char* modelPath, const char* renderVertexShaderPath, const char* renderFragmentShaderPath, Camera camera, Light light, Material material);
+	Piece(const char* vertexShaderPath, const char* fragmentShaderPath, Color color, Type type, glm::mat4 *projectionMatrix, Camera* camera, Light* light, Material* material);
 	Piece() = default;
-	void Draw(glm::vec3 mouseRay);
+	void Draw(glm::vec3 position, glm::vec3 mouseRay);
 
 private:
-	glm::vec3 squareToVector();
-	bool calculateIntersection(glm::vec3 mouseRay);
+	Model loadModel();
+	bool isIntersecting(glm::mat4 modelMatrix, glm::vec3 mouseRay);
 };
 
 

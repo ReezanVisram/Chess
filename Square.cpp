@@ -20,7 +20,7 @@ Square::Square(const char* darkTexturePath, const char* lightTexturePath, const 
 	prepareDrawing();
 }
 
-void Square::Draw() {
+void Square::Draw(glm::vec3 mouseRay) {
 	m_GL_Shader.use();
 	m_GL_Shader.setMat4Uniform("view", m_GL_Camera->getViewMatrix());
 	m_GL_Shader.setMat4Uniform("projection", *m_GL_ProjectionMatrix);
@@ -48,6 +48,9 @@ void Square::Draw() {
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 
+	if (m_Piece != nullptr) {
+		m_Piece->Draw(m_GL_Position, mouseRay);
+	}
 }
 
 void Square::prepareDrawing() {

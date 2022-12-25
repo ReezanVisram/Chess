@@ -14,14 +14,9 @@ Scene::Scene(GLFWwindow* window, Camera camera, Light light, glm::mat4 sceneProj
 		4.0
 	};
 
-	m_Board = createBoard();
+	m_Board = new Board(m_TexturesDirectory, glm::vec3(-4.0f, -3.0f, 0.0f), m_ShadersDirectory, &m_SceneProjectionMatrix, &m_Camera, &m_Light, &m_Wood);
 }
 
-Board Scene::createBoard() {
-	Board board = Board(m_TexturesDirectory, glm::vec3(-4.0f, -3.0f, 0.0f), m_ShadersDirectory, &m_SceneProjectionMatrix, &m_Camera, &m_Light, &m_Wood);
-	return board;
-}
-
-void Scene::Draw() {
-	m_Board.Draw(glm::vec3(0.0f, 0.0f, 0.0f));
+void Scene::Draw(glm::vec3 mouseRay) {
+	m_Board->Draw(mouseRay);
 }
