@@ -14,7 +14,6 @@
 #include "Light.h"
 #include "Board.h"
 
-
 class Scene {
 public:
 	GLFWwindow* m_Window;
@@ -26,11 +25,19 @@ public:
 	std::string m_ShadersDirectory;
 
 	Board* m_Board;
+	Piece* m_ActivePiece;
+	Square* m_SquareToMoveTo;
 	Scene() = default;
 	Scene(GLFWwindow* window, Camera camera, Light light, glm::mat4 sceneProjectionMatrix, std::string texturesDirectory, std::string shadersDirectory);
 
-	void Draw(glm::vec3 mouseRay);
-private:
+	void Draw(glm::vec3 mouseRay, bool mouseIsDown);
+	void unselectOldPiece();
+	void unselectOldSquare();
+	Piece* findSelectedPiece(glm::vec3 mouseRay);
+	Square* findSelectedSquare(glm::vec3 mouseRay);
+	Square* findOldSquare(Piece* piece);
+
+	void movePiece();
 };
 
 #endif

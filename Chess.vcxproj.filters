@@ -1625,6 +1625,8 @@
     </None>
     <None Include="Shaders\chesset.vert" />
     <None Include="Shaders\chesset.frag" />
+    <None Include="Shaders\outline.vert" />
+    <None Include="Shaders\outline.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\dark.jfif" />

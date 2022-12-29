@@ -27,6 +27,8 @@ void process_input(GLFWwindow* window);
 Camera camera(glm::vec3(0.0f, -10.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 50.0f);
 glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
 MousePicker mousePicker = MousePicker(camera, projectionMatrix);
+bool mouseIsDown = false;
+
 
 int main() {
 	glfwInit();
@@ -45,7 +47,7 @@ int main() {
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	// glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cerr << "Failed to initialize GLAD" << std::endl;
@@ -70,12 +72,14 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.094f, 0.125f, 0.47f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glm::vec3 mouseRay = mousePicker.currentRay;
-		scene.Draw(mouseRay);
+		scene.Draw(mouseRay, mouseIsDown);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -85,12 +89,19 @@ int main() {
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-		std::cout << "Current mouse ray: (" << mousePicker.currentRay.x << ", " << mousePicker.currentRay.y << ", " << mousePicker.currentRay.z << ").\n";
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (action == GLFW_PRESS) {
+			mouseIsDown = true;
+		}
+		else if (action == GLFW_RELEASE) {
+			mouseIsDown = false;
+		}
+	}
 }
 
 void cursor_position_callback(GLFWwindow* window, double xPos, double yPos) {
 	mousePicker.update((float)xPos, (float)yPos);
+	// std::cout << "Mouse position: (" << xPos << ", " << yPos << ")\n";
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {

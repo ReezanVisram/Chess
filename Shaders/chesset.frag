@@ -21,7 +21,7 @@ in vec3 FragPos;
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
-uniform bool isIntersecting;
+uniform bool isSelected;
 
 uniform Material material;
 uniform Light light;
@@ -46,10 +46,9 @@ void main() {
 
 	vec3 result = ambient + diffuse + specular;
 
-	if (isIntersecting) {
-		FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	if (isSelected) {
+		FragColor = vec4(result, 1.0) * vec4(1.0, 0.0, 1.0, 1.0);
 	} else {
 		FragColor = vec4(result, 1.0);
 	}
-
 }

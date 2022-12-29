@@ -25,9 +25,9 @@ Board::Board(std::string texturesDirectory, glm::vec3 startingPoint, std::string
 	LoadPositionFromFen("r1bqk2r/pppp1pp1/5n1p/2b1P3/3n3B/2N5/PPP2PPP/R2QKB1R b KQkq - 0 8");
 }
 
-void Board::Draw(glm::vec3 mouseRay) {
+void Board::Draw(glm::vec3 mouseRay, bool mouseIsDown) {
 	for (int i = 0; i < 64; i++) {
-		m_Squares[i].Draw(mouseRay);
+		m_Squares[i].Draw(mouseRay, mouseIsDown);
 	}
 }
 
@@ -55,7 +55,8 @@ void Board::LoadPositionFromFen(std::string fenString) {
 					pieceColor = White;
 				}
 				Type pieceType = charToPiece[tolower(symbol)];
-				m_Pieces[i] = Piece((m_ShadersDirectory + "/chesset.vert").c_str(), (m_ShadersDirectory + "/chesset.frag").c_str(), pieceColor, pieceType, m_GL_ProjectionMatrix, m_GL_Camera, m_GL_Light, m_GL_Material);
+				m_Pieces[i] = Piece((m_ShadersDirectory + "/chesset.vert").c_str(), (m_ShadersDirectory + "/chesset.frag").c_str(), (m_ShadersDirectory + "/outline.vert").c_str(), (m_ShadersDirectory + "/outline.frag").c_str(), pieceColor, pieceType, m_GL_ProjectionMatrix, m_GL_Camera, m_GL_Light, m_GL_Material);
+				m_Pieces[i].m_GL_Position = m_Squares[file * 8 + rank].m_GL_Position;
 				m_Squares[file * 8 + rank].m_Piece = &m_Pieces[i];
 				file++;
 				i++;

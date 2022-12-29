@@ -26,7 +26,7 @@ public:
 
 	Board(std::string texturesDirectory, glm::vec3 startingPoint, std::string shadersDirectory, glm::mat4 *projectionMatrix, Camera *camera, Light *light, Material *material);
 	Board() = default;
-	void Draw(glm::vec3 mouseRay);
+	void Draw(glm::vec3 mouseRay, bool mouseIsDown);
 	void LoadPositionFromFen(std::string fenString);
 
 private:

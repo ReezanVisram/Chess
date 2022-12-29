@@ -1,8 +1,9 @@
 #include <map>
 #include "Piece.h"
 
-Piece::Piece(const char* vertexShaderPath, const char* fragmentShaderPath, Color color, Type type, glm::mat4 *projectionMatrix, Camera* camera, Light* light, Material* material) {
+Piece::Piece(const char* vertexShaderPath, const char* fragmentShaderPath, const char* outlineVertexShaderPath, const char* outlineFragmentShaderPath, Color color, Type type, glm::mat4 *projectionMatrix, Camera* camera, Light* light, Material* material) {
 	m_GL_Shader = Shader(vertexShaderPath, fragmentShaderPath);
+	m_GL_OutlineShader = Shader(outlineVertexShaderPath, outlineFragmentShaderPath);
 	m_GL_ViewMatrix = camera->getViewMatrix();
 	m_GL_ProjectionMatrix = projectionMatrix;
 	m_Color = color;
@@ -49,12 +50,13 @@ Model Piece::loadModel() {
 	return Model(modelLocation.c_str());
 }
 
-void Piece::Draw(glm::vec3 position, glm::vec3 mouseRay) {
+void Piece::Draw(glm::vec3 mouseRay, bool mouseIsDown) {
 	m_GL_Shader.use();
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	modelMatrix = glm::translate(modelMatrix, position);
+	modelMatrix = glm::translate(modelMatrix, m_GL_Position);
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.05f, 0.05f, 0.05f));
+	m_GL_ModelMatrix = modelMatrix;
 	m_GL_Shader.setMat4Uniform("model", modelMatrix);
 	m_GL_Shader.setMat4Uniform("projection", *m_GL_ProjectionMatrix);
 	m_GL_Shader.setMat4Uniform("view", m_GL_ViewMatrix);
@@ -67,15 +69,15 @@ void Piece::Draw(glm::vec3 position, glm::vec3 mouseRay) {
 	m_GL_Shader.setVec3Uniform("material.diffuse", m_GL_Material->diffuse);
 	m_GL_Shader.setVec3Uniform("material.specular", m_GL_Material->specular);
 	m_GL_Shader.setFloatUniform("material.shininess", m_GL_Material->shininess);
-	m_GL_Shader.setBoolUniform("isIntersecting", isIntersecting(modelMatrix, mouseRay));
+	m_GL_Shader.setBoolUniform("isSelected", m_GL_IsSelected);
 	m_GL_Model.Draw(m_GL_Shader);
 }
 
-bool Piece::isIntersecting(glm::mat4 modelMatrix, glm::vec3 mouseRay) {
-	glm::vec3 center = modelMatrix * glm::vec4((m_GL_Model.minVertexPos.x + m_GL_Model.maxVertexPos.x) / 2, (m_GL_Model.minVertexPos.y + m_GL_Model.maxVertexPos.y) / 2, (m_GL_Model.minVertexPos.z + m_GL_Model.maxVertexPos.z) / 2, 1.0);
+bool Piece::IsSelected(glm::vec3 mouseRay) {
+	glm::vec3 center = m_GL_ModelMatrix * glm::vec4((m_GL_Model.minVertexPos.x + m_GL_Model.maxVertexPos.x) / 2, (m_GL_Model.minVertexPos.y + m_GL_Model.maxVertexPos.y) / 2, (m_GL_Model.minVertexPos.z + m_GL_Model.maxVertexPos.z) / 2, 1.0);
 
 	glm::vec3 oc = m_GL_Camera->position - center;
 	float b = glm::dot(oc, mouseRay);
-	float c = glm::dot(oc, oc) - 0.25f * 0.25f;
+	float c = glm::dot(oc, oc) - 0.5f * 0.5f;
 	return b * b - c >= 0;
 }
