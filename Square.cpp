@@ -35,7 +35,7 @@ void Square::Draw(glm::vec3 mouseRay, bool mouseIsDown) {
 	m_GL_Shader.setVec3Uniform("light.ambient", m_GL_Light->ambient);
 	m_GL_Shader.setVec3Uniform("light.diffuse", m_GL_Light->diffuse);
 	m_GL_Shader.setVec3Uniform("light.specular", m_GL_Light->specular);
-	m_GL_Shader.setBoolUniform("isSelected", IsSelected(mouseRay));
+	m_GL_Shader.setBoolUniform("isSelected", m_GL_IsSelected);
 
 	m_GL_ModelMatrix = glm::mat4(1.0f);
 	m_GL_ModelMatrix = glm::translate(m_GL_ModelMatrix, m_GL_Position);
@@ -52,7 +52,7 @@ void Square::Draw(glm::vec3 mouseRay, bool mouseIsDown) {
 	}
 
 	if (m_Piece != nullptr) {
-		m_Piece->Draw(mouseRay, mouseIsDown);
+		m_Piece->Draw(mouseRay, m_GL_Position);
 	}
 }
 

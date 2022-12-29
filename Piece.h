@@ -46,7 +46,7 @@ public:
 
 	Piece(const char* vertexShaderPath, const char* fragmentShaderPath, const char* outlineVertexShaderPath, const char* outlineFragmentShaderPath, Color color, Type type, glm::mat4 *projectionMatrix, Camera* camera, Light* light, Material* material);
 	Piece() = default;
-	void Draw(glm::vec3 mouseRay, bool mouseIsDown);
+	void Draw(glm::vec3 mouseRay, glm::vec3 position);
 	bool IsSelected(glm::vec3 mouseRay);
 private:
 	Model loadModel();

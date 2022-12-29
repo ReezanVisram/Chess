@@ -50,10 +50,10 @@ Model Piece::loadModel() {
 	return Model(modelLocation.c_str());
 }
 
-void Piece::Draw(glm::vec3 mouseRay, bool mouseIsDown) {
+void Piece::Draw(glm::vec3 mouseRay, glm::vec3 position) {
 	m_GL_Shader.use();
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	modelMatrix = glm::translate(modelMatrix, m_GL_Position);
+	modelMatrix = glm::translate(modelMatrix, position);
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.05f, 0.05f, 0.05f));
 	m_GL_ModelMatrix = modelMatrix;

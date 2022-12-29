@@ -24,6 +24,8 @@ public:
 	std::string m_TexturesDirectory;
 	std::string m_ShadersDirectory;
 
+	bool m_MouseWasPressed;
+
 	Board* m_Board;
 	Piece* m_ActivePiece;
 	Square* m_SquareToMoveTo;
@@ -35,7 +37,7 @@ public:
 	void unselectOldSquare();
 	Piece* findSelectedPiece(glm::vec3 mouseRay);
 	Square* findSelectedSquare(glm::vec3 mouseRay);
-	Square* findOldSquare(Piece* piece);
+	Square* findOldSquare();
 
 	void movePiece();
 };
