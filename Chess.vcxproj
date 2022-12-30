@@ -701,6 +701,7 @@
     <None Include="Shaders\square.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="indices.png" />
     <Image Include="Textures\border.jpg" />
     <Image Include="Textures\dark.jfif" />
     <Image Include="Textures\dark.jpg" />

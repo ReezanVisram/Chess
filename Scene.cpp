@@ -53,6 +53,7 @@ void Scene::movePiece() {
 
 	oldSquare->m_Piece = nullptr;
 	m_SquareToMoveTo->m_Piece = m_ActivePiece;
+	m_ActivePiece->m_HasMoved = true;
 	unselectOldPiece();
 	unselectOldSquare();
 	m_SquareToMoveTo = nullptr;
@@ -124,6 +125,8 @@ void Scene::nextTurn() {
 }
 
 void Scene::precomputeMoveData() {
+	int knightOffsets[] = { -6, 6, -15, 15, -10, 10, -17, 17 };
+
 	for (int file = 0; file < 8; file++) {
 		for (int rank = 0; rank < 8; rank++) {
 			unsigned int numNorth = 7 - rank;
@@ -136,6 +139,26 @@ void Scene::precomputeMoveData() {
 			unsigned int dirValues[8] = { numNorth, numSouth, numWest, numEast, std::min(numNorth, numWest), std::min(numSouth, numEast), std::min(numNorth, numEast), std::min(numSouth, numWest) };
 			for (int i = 0; i < 8; i++) {
 				m_NumSquaresToEdge[squareIndex][i] = dirValues[i];
+			}
+
+			// Knight
+			unsigned int knightSquares[8] = {};
+			unsigned int numPossibleKnightSquares = 0;
+			for (int knightJump = 0; knightJump < 8; knightJump++) {
+				int target = squareIndex + knightOffsets[knightJump];
+				if (target >= 0 && target < 64) {
+					int knightSquareX = target / 8;
+					int knightSquareY = target - knightSquareX * 8;
+					int maxMoveDistance = std::max(std::abs(file - knightSquareX), std::abs(rank - knightSquareY));
+					if (maxMoveDistance == 2) {
+						knightSquares[numPossibleKnightSquares] = target;
+						numPossibleKnightSquares++;
+					}
+				}
+			}
+
+			for (int i = 0; i < 8; i++) {
+				m_KnightMoves[squareIndex][i] = knightSquares[i];
 			}
 		}
 	}
@@ -150,6 +173,12 @@ std::vector<Move> Scene::generateMoves() {
 			if (piece->m_Color == m_ColorToMove) {
 				if (piece->m_Type == Queen || piece->m_Type == Rook || piece->m_Type == Bishop) {
 					generateSlidingMoves(start, piece, moves);
+				}
+				else if (piece->m_Type == Knight) {
+					generateKnightMoves(start, piece, moves);
+				}
+				else if (piece->m_Type == Pawn) {
+					generatePawnMoves(start, piece, moves);
 				}
 			}
 		}
@@ -172,7 +201,7 @@ void Scene::generateSlidingMoves(unsigned int start, Piece* piece, std::vector<M
 
 	for (int direction = startDirIndex; direction < endDirIndex; direction++) {
 		for (int n = 0; n < m_NumSquaresToEdge[start][direction]; n++) {
-			int targetSquare = start + m_DirectionOffsets[direction] * (n + 1);
+			int targetSquare = start + m_SlidingDirectionOffsets[direction] * (n + 1);
 
 			Piece* pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
 
@@ -186,6 +215,65 @@ void Scene::generateSlidingMoves(unsigned int start, Piece* piece, std::vector<M
 			if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_Color != piece->m_Color) {
 				break;
 			}
+		}
+	}
+}
+
+void Scene::generateKnightMoves(unsigned int start, Piece* piece, std::vector<Move>& moves) {
+	for (int n = 0; n < 8; n++) {
+		if (m_KnightMoves[start][n] != 0) {
+			int targetSquare = m_KnightMoves[start][n];
+
+			Piece* pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
+
+			if ((pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_Color != piece->m_Color) || pieceOnTargetSquare == nullptr) {
+				Move move = { piece, start, targetSquare };
+				moves.push_back(move);
+			}
+
+
+		}
+	}
+}
+
+void Scene::generatePawnMoves(unsigned int start, Piece* piece, std::vector<Move>& moves) {
+	int moveDir = 0;
+	if (piece->m_Color == White) {
+		moveDir = 1;
+	}
+	else {
+		moveDir = -1;
+	}
+
+	// 1 straight move
+	Piece* pieceOnTargetSquare = m_Board->m_Squares[start + moveDir].m_Piece;
+	if (pieceOnTargetSquare == nullptr) {
+		Move move = { piece, start, start + moveDir };
+		moves.push_back(move);
+	}
+
+	// 2 straight on first movve
+	pieceOnTargetSquare = m_Board->m_Squares[start + moveDir * 2].m_Piece;
+	if (pieceOnTargetSquare == nullptr && !piece->m_HasMoved) {
+		Move move = { piece, start, start + moveDir * 2 };
+		moves.push_back(move);
+	}
+
+	// Check captures
+	int targetSquare = start + 9 * moveDir;
+	if (targetSquare >= 0 && targetSquare < 63) {
+		pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
+		if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_Color != piece->m_Color) {
+			Move move = { piece, start, targetSquare };
+			moves.push_back(move);
+		}
+	}
+	targetSquare = start - 7 * moveDir;
+	if (targetSquare >= 0 && targetSquare < 63) {
+		pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
+		if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_Color != piece->m_Color) {
+			Move move = { piece, start, targetSquare };
+			moves.push_back(move);
 		}
 	}
 }

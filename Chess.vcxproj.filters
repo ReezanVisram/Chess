@@ -1640,5 +1640,8 @@
     <Image Include="Textures\border.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="indices.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

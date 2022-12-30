@@ -29,6 +29,7 @@ public:
 	// Piece Information
 	Type m_Type;
 	Color m_Color;
+	bool m_HasMoved = false;
 
 	// OpenGL Information
 	Model m_GL_Model;

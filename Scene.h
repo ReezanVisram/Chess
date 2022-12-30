@@ -42,8 +42,9 @@ public:
 
 	void Draw(glm::vec3 mouseRay, bool mouseIsDown);
 private:
-	int m_DirectionOffsets[8] = { 1, -1, -8, 8, -7, 7, 9, -9 };
+	int m_SlidingDirectionOffsets[8] = { 1, -1, -8, 8, -7, 7, 9, -9 };
 	int m_NumSquaresToEdge[64][8];
+	int m_KnightMoves[64][8];
 
 	void precomputeMoveData();
 
@@ -59,6 +60,8 @@ private:
 
 	std::vector<Move> generateMoves();
 	void generateSlidingMoves(unsigned int start, Piece* piece, std::vector<Move> &moves);
+	void generateKnightMoves(unsigned int start, Piece* piece, std::vector<Move>& moves);
+	void generatePawnMoves(unsigned int start, Piece* piece, std::vector<Move>& moves);
 };
 
 #endif

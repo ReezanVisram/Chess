@@ -12,7 +12,7 @@ Piece::Piece(const char* vertexShaderPath, const char* fragmentShaderPath, const
 	m_GL_Camera = camera;
 	m_GL_Light = light;
 	m_GL_Material = material;
-
+	m_GL_IsSelected = false;
 }
 
 Model Piece::loadModel() {
