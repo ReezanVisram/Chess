@@ -15,6 +15,7 @@ Square::Square(const char* darkTexturePath, const char* lightTexturePath, const 
 	m_GL_Material = material;
 	m_GL_ViewMatrix = m_GL_Camera->getViewMatrix();
 	m_GL_IsSelected = false;
+	m_IsLegal = false;
 
 	glGenTextures(1, &m_GL_DarkTexture);
 	glGenTextures(1, &m_GL_LightTexture);
@@ -36,6 +37,7 @@ void Square::Draw(glm::vec3 mouseRay, bool mouseIsDown) {
 	m_GL_Shader.setVec3Uniform("light.diffuse", m_GL_Light->diffuse);
 	m_GL_Shader.setVec3Uniform("light.specular", m_GL_Light->specular);
 	m_GL_Shader.setBoolUniform("isSelected", m_GL_IsSelected);
+	m_GL_Shader.setBoolUniform("isLegal", m_IsLegal);
 
 	m_GL_ModelMatrix = glm::mat4(1.0f);
 	m_GL_ModelMatrix = glm::translate(m_GL_ModelMatrix, m_GL_Position);

@@ -20,6 +20,7 @@ public:
 	unsigned int m_File;
 	unsigned int m_Rank;
 	Piece *m_Piece = nullptr;
+	bool m_IsLegal;
 
 	// OpenGL Information
 	bool m_GL_IsLight;

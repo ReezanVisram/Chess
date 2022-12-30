@@ -22,7 +22,7 @@ Board::Board(std::string texturesDirectory, glm::vec3 startingPoint, std::string
 			i++;
 		}
 	}
-	LoadPositionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	LoadPositionFromFen("B3Q////q///b");
 }
 
 void Board::Draw(glm::vec3 mouseRay, bool mouseIsDown) {

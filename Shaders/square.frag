@@ -25,6 +25,7 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
 uniform bool isSelected;
+uniform bool isLegal;
 
 void main() {
 	// ambient
@@ -45,7 +46,9 @@ void main() {
 	vec3 result = ambient + diffuse + specular;
 
 	if (isSelected) {
-		FragColor = vec4(result, 1.0) * vec4(1.0, 0.0, 1.0, 1.0);
+		FragColor = vec4(result, 1.0) * vec4(1.0, 0.0, 0.0, 1.0);
+	} else if (isLegal) {
+		FragColor = vec4(result, 1.0) * vec4(0.0, 1.0, 0.0, 1.0);
 	} else {
 		FragColor = vec4(result, 1.0);
 	}
