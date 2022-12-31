@@ -54,6 +54,23 @@ void Scene::movePiece() {
 	oldSquare->m_Piece = nullptr;
 	m_SquareToMoveTo->m_Piece = m_ActivePiece;
 	m_ActivePiece->m_HasMoved = true;
+	m_ActivePiece->m_NumMoves++;
+	switch (m_EnPassant) {
+	case None:
+		break;
+	case WhiteLeft:
+		m_Board->m_Squares[m_SquareToMoveTo->m_File * 8 + m_SquareToMoveTo->m_Rank - 1].m_Piece = nullptr;
+		break;
+	case WhiteRight:
+		m_Board->m_Squares[m_SquareToMoveTo->m_File * 8 + m_SquareToMoveTo->m_Rank - 1].m_Piece = nullptr;
+		break;
+	case BlackLeft:
+		m_Board->m_Squares[m_SquareToMoveTo->m_File * 8 + m_SquareToMoveTo->m_Rank + 1].m_Piece = nullptr;
+		break;
+	case BlackRight:
+		m_Board->m_Squares[m_SquareToMoveTo->m_File * 8 + m_SquareToMoveTo->m_Rank + 1].m_Piece = nullptr;
+		break;
+	}
 	unselectOldPiece();
 	unselectOldSquare();
 	m_SquareToMoveTo = nullptr;
@@ -90,6 +107,7 @@ Square* Scene::findSelectedSquare(glm::vec3 mouseRay) {
 }
 
 void Scene::unselectOldPiece() {
+	m_EnPassant = None;
 	for (int i = 0; i < 64; i++) {
 		Piece* piece = m_Board->m_Squares[i].m_Piece;
 		if (piece != nullptr) {
@@ -179,6 +197,9 @@ std::vector<Move> Scene::generateMoves() {
 				}
 				else if (piece->m_Type == Pawn) {
 					generatePawnMoves(start, piece, moves);
+				}
+				else if (piece->m_Type == King) {
+					generateKingMoves(start, piece, moves);
 				}
 			}
 		}
@@ -272,6 +293,73 @@ void Scene::generatePawnMoves(unsigned int start, Piece* piece, std::vector<Move
 	if (targetSquare >= 0 && targetSquare < 63) {
 		pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
 		if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_Color != piece->m_Color) {
+			Move move = { piece, start, targetSquare };
+			moves.push_back(move);
+		}
+	}
+
+	// En passant (White)
+	if (piece->m_Color == White && start % 8 == 4) {
+		// Left
+		targetSquare = start - 8;
+		if (targetSquare > 0) {
+			pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
+
+			if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_NumMoves == 1) {
+				Move move = { piece, start, start - 7 };
+				m_EnPassant = WhiteLeft;
+				moves.push_back(move);
+			}
+		}
+		targetSquare = start + 8;
+		if (targetSquare < 63) {
+			pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
+
+			if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_NumMoves == 1) {
+				Move move = { piece, start, start + 9 };
+				m_EnPassant = WhiteRight;
+				moves.push_back(move);
+			}
+		}
+	}
+
+	// En passant (Black)
+	if (piece->m_Color == Black && start % 8 == 3) {
+		// Left
+		targetSquare = start - 8;
+		if (targetSquare > 0) {
+			pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
+
+			if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_NumMoves == 1) {
+				Move move = { piece, start, start - 9 };
+				m_EnPassant = BlackLeft;
+				moves.push_back(move);
+			}
+		}
+		targetSquare = start + 8;
+		if (targetSquare < 63) {
+			pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
+
+			if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_NumMoves == 1) {
+				Move move = { piece, start, start + 7 };
+				m_EnPassant = BlackRight;
+				moves.push_back(move);
+			}
+		}
+	}
+
+}
+
+void Scene::generateKingMoves(unsigned int start, Piece* piece, std::vector<Move>& moves) {
+	for (int direction = 0; direction < 8; direction++) {
+		int targetSquare = start + m_SlidingDirectionOffsets[direction];
+
+		if (targetSquare >= 0 && targetSquare < 63) {
+			Piece* pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
+			if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_Color == piece->m_Color) {
+				break;
+			}
+
 			Move move = { piece, start, targetSquare };
 			moves.push_back(move);
 		}

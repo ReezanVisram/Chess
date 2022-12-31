@@ -30,6 +30,7 @@ public:
 	Type m_Type;
 	Color m_Color;
 	bool m_HasMoved = false;
+	int m_NumMoves = 0;
 
 	// OpenGL Information
 	Model m_GL_Model;

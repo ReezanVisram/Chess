@@ -20,6 +20,14 @@ struct Move {
 	unsigned int targetSquare;
 };
 
+enum EnPassantType {
+	None,
+	WhiteLeft,
+	WhiteRight,
+	BlackLeft,
+	BlackRight
+};
+
 class Scene {
 public:
 	GLFWwindow* m_Window;
@@ -45,6 +53,7 @@ private:
 	int m_SlidingDirectionOffsets[8] = { 1, -1, -8, 8, -7, 7, 9, -9 };
 	int m_NumSquaresToEdge[64][8];
 	int m_KnightMoves[64][8];
+	EnPassantType m_EnPassant = None;
 
 	void precomputeMoveData();
 
@@ -62,6 +71,7 @@ private:
 	void generateSlidingMoves(unsigned int start, Piece* piece, std::vector<Move> &moves);
 	void generateKnightMoves(unsigned int start, Piece* piece, std::vector<Move>& moves);
 	void generatePawnMoves(unsigned int start, Piece* piece, std::vector<Move>& moves);
+	void generateKingMoves(unsigned int start, Piece* piece, std::vector<Move>& moves);
 };
 
 #endif
