@@ -131,6 +131,7 @@ Square* Scene::findOldSquare() {
 			return square;
 		}
 	}
+	return nullptr;
 }
 
 void Scene::nextTurn() {
@@ -352,16 +353,24 @@ void Scene::generatePawnMoves(unsigned int start, Piece* piece, std::vector<Move
 
 void Scene::generateKingMoves(unsigned int start, Piece* piece, std::vector<Move>& moves) {
 	for (int direction = 0; direction < 8; direction++) {
-		int targetSquare = start + m_SlidingDirectionOffsets[direction];
+		int target = start + m_SlidingDirectionOffsets[direction];
+		
+		if (target > 0 && target < 64) {
+			Piece* pieceOnTargetSquare = m_Board->m_Squares[target].m_Piece;
 
-		if (targetSquare >= 0 && targetSquare < 63) {
-			Piece* pieceOnTargetSquare = m_Board->m_Squares[targetSquare].m_Piece;
-			if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_Color == piece->m_Color) {
-				break;
+			if (pieceOnTargetSquare != nullptr && pieceOnTargetSquare->m_Color != piece->m_Color || pieceOnTargetSquare == nullptr) {
+				Square* startSquare = &m_Board->m_Squares[start];
+				Square* targetSquare = &m_Board->m_Squares[target];
+
+				int kingSquareX = target / 8;
+				int kingSquareY = target - kingSquareX * 8;
+				int maxMoveDistance = std::max(std::abs((int)startSquare->m_File - kingSquareX), std::abs((int)startSquare->m_Rank - kingSquareY));
+				if (maxMoveDistance == 1) {
+					Move move = { piece, start, target };
+					moves.push_back(move);
+				}
 			}
-
-			Move move = { piece, start, targetSquare };
-			moves.push_back(move);
 		}
+
 	}
 }
